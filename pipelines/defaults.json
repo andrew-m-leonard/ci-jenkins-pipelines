@@ -1,7 +1,7 @@
 {
     "repository"             : {
         "build_url"          : "https://github.com/andrew-m-leonard/openjdk-build.git",
-        "build_branch"       : "hotspotbootjdk",
+        "build_branch"       : "vendorversion",
         "pipeline_url"       : "https://github.com/AdoptOpenJDK/ci-jenkins-pipelines.git",
         "pipeline_branch"    : "master"
     },
