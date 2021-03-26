@@ -1,7 +1,7 @@
 {
     "repository"             : {
-        "build_url"          : "https://github.com/andrew-m-leonard/openjdk-build.git",
-        "build_branch"       : "shellcheck",
+        "build_url"          : "https://github.com/M-Davies/openjdk-build.git",
+        "build_branch"       : "mac_shellcheck",
         "pipeline_url"       : "https://github.com/AdoptOpenJDK/ci-jenkins-pipelines.git",
         "pipeline_branch"    : "master"
     },
