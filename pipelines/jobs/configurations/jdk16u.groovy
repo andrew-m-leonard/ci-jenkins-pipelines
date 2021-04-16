@@ -41,7 +41,8 @@ targetConfigurations = [
 // 23:30 Mon, Wed, Fri
 triggerSchedule_nightly="TZ=UTC\n30 23 * * 1,3,5"
 // 04:30 Sun
-triggerSchedule_weekly="TZ=UTC\n30 04 * * 7"
+//triggerSchedule_weekly="TZ=UTC\n30 04 * * 7"
+triggerSchedule_weekly="0 0 31 2 0" // Disabled: 31st Feb, so will never run
 
 // scmReferences to use for weekly release build
 weekly_release_scmReferences=[
