@@ -1,7 +1,7 @@
 {
     "repository"             : {
-        "build_url"          : "https://github.com/AdoptOpenJDK/openjdk-build.git",
-        "build_branch"       : "ea53ac3d1623de5ecefdcd9aee3379a776be84b2",
+        "build_url"          : "https://github.com/andrew-m-leonard/openjdk-build.git",
+        "build_branch"       : "aixdebugon",
         "pipeline_url"       : "https://github.com/AdoptOpenJDK/ci-jenkins-pipelines.git",
         "pipeline_branch"    : "master"
     },
