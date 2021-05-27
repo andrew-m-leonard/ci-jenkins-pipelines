@@ -986,7 +986,7 @@ class Build {
         // Setup params for downstream job & execute
         String shortJobName = env.JOB_NAME.split('/').last()
         String copyFileFilter = "${shortJobName}_${env.BUILD_NUMBER}_version.txt"
-
+context.println "DEBUG: ${copyFileFilter}"
         def nodeFilter = "${buildConfig.TARGET_OS}&&${buildConfig.ARCHITECTURE}"
 
         def filter = ""
@@ -1007,7 +1007,9 @@ class Build {
                 context.string(name: 'NODE', value: "${nodeFilter}"),
                 context.string(name: 'OS', value: "${buildConfig.TARGET_OS}")
             ]
-
+try {
+context.println "DEBUG: calling copyArtifacts"
+context.println context.specific("${crossCompileVersionOut.getNumber()}")
         context.copyArtifacts(
             projectName: "build-scripts/utils/cross-compiled-version-out",
             selector: context.specific("${crossCompileVersionOut.getNumber()}"),
@@ -1015,6 +1017,10 @@ class Build {
             target: "workspace/target/metadata",
             flatten: true
         )
+context.println "DEBUG: finished copyArtifacts"
+} catch (FlowInterruptedException e) {
+            context.println "EXCEPTION: "+e
+        }
 
         // We assign to a variable so it can be used in formMetadata() to find the correct version info
         crossCompileVersionPath = "workspace/target/metadata/${copyFileFilter}"
