@@ -1226,7 +1226,7 @@ class Build {
                                         context.println "Building an exploded image for signing"
                                         context.sh(script: "./${ADOPT_DEFAULTS_JSON['scriptDirectories']['buildfarm']}")
                                     }
-                            //if (buildConfig.JAVA_TO_BUILD == "codesign") {
+                            if (buildConfig.JAVA_TO_BUILD == "codesign") {
                                     def macos_base_path_arch = "x86_64"
                                     if (buildConfig.ARCHITECTURE == "aarch64") {
                                         macos_base_path_arch = "aarch64"
@@ -1283,7 +1283,7 @@ class Build {
 
                                     // Restore signed JMODs
                                     context.unstash 'signed_jmods'
-                        //} // if codesign
+                          } // if codesign
                                     def macAssembleBuildArgs
                                     if (env.BUILD_ARGS != null && !env.BUILD_ARGS.isEmpty()) {
                                         macAssembleBuildArgs = env.BUILD_ARGS+" --assemble-exploded-image"
