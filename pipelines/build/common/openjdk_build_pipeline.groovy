@@ -1215,7 +1215,7 @@ class Build {
                             if (useAdoptShellScripts) {
                                 context.println "[CHECKOUT] Checking out to adoptium/temurin-build..."
                                 repoHandler.checkoutAdoptBuild(context)
-                                if (buildConfig.TARGET_OS == "mac" && buildConfig.JAVA_TO_BUILD != "jdk8u") {
+                                if (buildConfig.TARGET_OS == "ignore_mac" && buildConfig.JAVA_TO_BUILD != "jdk8u") {
                                     def macSignBuildArgs
                                     if (env.BUILD_ARGS != null && !env.BUILD_ARGS.isEmpty()) {
                                         macSignBuildArgs = env.BUILD_ARGS+" --make-exploded-image"
