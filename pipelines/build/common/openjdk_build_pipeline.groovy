@@ -1237,9 +1237,7 @@ class Build {
                                     context.stash name: 'jmods',
                                         includes: "${macos_base_path}/hotspot/variant-server/**/*," +
                                             "${macos_base_path}/support/modules_cmds/**/*," +
-                                            "${macos_base_path}/support/modules_libs/**/*," +
-                                            // JDK 16 + jpackage needs to be signed as well
-                                            "${macos_base_path}/jdk/modules/jdk.jpackage/jdk/jpackage/internal/resources/jpackageapplauncher" 
+                                            "${macos_base_path}/support/modules_libs/**/*"
 
                                     context.node('eclipse-codesign') {
                                         context.sh "rm -rf ${macos_base_path}/* || true"
@@ -1276,9 +1274,9 @@ class Build {
                                     context.sh "rm -rf ${macos_base_path}/support/modules_cmds || true"
                                     context.sh "rm -rf ${macos_base_path}/support/modules_libs || true"
                                     // JDK 16 + jpackage needs to be signed as well
-                                    if (buildConfig.JAVA_TO_BUILD != "jdk11u") {
-                                        context.sh "rm -rf ${macos_base_path}/jdk/modules/jdk.jpackage/jdk/jpackage/internal/resources/jpackageapplauncher || true"
-                                    }
+                                    //if (buildConfig.JAVA_TO_BUILD != "jdk11u") {
+                                    //    context.sh "rm -rf ${macos_base_path}/jdk/modules/jdk.jpackage/jdk/jpackage/internal/resources/jpackageapplauncher || true"
+                                    //}
 
                                     // Restore signed JMODs
                                     context.unstash 'signed_jmods'
