@@ -1,7 +1,7 @@
 {
     "repository"             : {
         "build_url"          : "https://github.com/andrew-m-leonard/openjdk-build.git",
-        "build_branch"       : "sbom",
+        "build_branch"       : "bootjdk17",
         "pipeline_url"       : "https://github.com/AdoptOpenJDK/ci-jenkins-pipelines.git",
         "pipeline_branch"    : "master"
     },
