@@ -1215,6 +1215,7 @@ class Build {
         useAdoptShellScripts
     ) {
         return context.stage("build") {
+            context.sh(script:"printenv")
             // Create the repo handler with the user's defaults to ensure a temurin-build checkout is not null
             def repoHandler = new RepoHandler(USER_REMOTE_CONFIGS)
             repoHandler.setUserDefaultsJson(context, DEFAULTS_JSON['defaultsUrl'])
