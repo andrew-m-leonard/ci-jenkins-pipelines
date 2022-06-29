@@ -1,7 +1,7 @@
 {
     "repository"             : {
-        "build_url"          : "https://github.com/andrew-m-leonard/openjdk-build.git",
-        "build_branch"       : "tagsearch",
+        "build_url"          : "https://github.com/steelhead31/temurin-build.git",
+        "build_branch"       : "fix_issue_3008",
         "pipeline_url"       : "https://github.com/AdoptOpenJDK/ci-jenkins-pipelines.git",
         "pipeline_branch"    : "master"
     },
