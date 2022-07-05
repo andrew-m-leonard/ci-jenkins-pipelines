@@ -22,5 +22,5 @@ sh("rm -rf ${path}/.git && cd ${path} && git init && git add --all . && git conf
 sh("rm pipelines/library/src/common/IndividualBuildConfig.groovy")
 def repoPath = sh(returnStdout: true, script: "pwd").trim() + "/" + path;
 library(identifier: 'local-lib@master', retriever: modernSCM([$class: 'GitSCMSource', remote: repoPath]))
-
+sh("cat pipelines/library/src/common/IndividualBuildConfig.groovy")
 
