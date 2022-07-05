@@ -94,8 +94,8 @@ class Build {
         def env,
         def currentBuild
     ) {
-confJson = buildConfig.toJson()
-context.println "DEBUG openjdk constructor: ${confJson}"
+//confJson = buildConfig.toJson()
+//context.println "DEBUG openjdk constructor: ${confJson}"
         this.buildConfig = buildConfig
         this.USER_REMOTE_CONFIGS = USER_REMOTE_CONFIGS
         this.DEFAULTS_JSON = DEFAULTS_JSON
