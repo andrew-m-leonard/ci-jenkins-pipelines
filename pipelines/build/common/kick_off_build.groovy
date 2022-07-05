@@ -74,7 +74,7 @@ node("worker") {
 
 }
 
-println "DEBUG kick off: ${BUILD_CONFIGURATION}"
+//println "DEBUG kick off: ${BUILD_CONFIGURATION}"
 downstreamBuilder(
     BUILD_CONFIGURATION,
     userRemoteConfigs,
