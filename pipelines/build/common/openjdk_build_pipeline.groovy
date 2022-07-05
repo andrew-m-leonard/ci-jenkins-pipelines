@@ -1823,11 +1823,8 @@ return {
     currentBuild ->
         def buildConfig
         if (String.class.isInstance(buildConfigArg)) {
-context.println("IF 1")
-context.println "DEBUG openjdk return args : ${buildConfigArg}"
             buildConfig = new IndividualBuildConfig(buildConfigArg as String)
         } else {
-context.println("IF 2")
             buildConfig = buildConfigArg as IndividualBuildConfig
         }
 
