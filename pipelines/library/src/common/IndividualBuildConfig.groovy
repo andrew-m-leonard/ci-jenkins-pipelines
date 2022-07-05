@@ -44,6 +44,7 @@ class IndividualBuildConfig implements Serializable {
     final boolean CLEAN_WORKSPACE_BUILD_OUTPUT_ONLY_AFTER
 
     IndividualBuildConfig(String json) {
+println "IndividualBuildConfig constructor : ${json}"
         this(new JsonSlurper().parseText(json) as Map)
     }
 
