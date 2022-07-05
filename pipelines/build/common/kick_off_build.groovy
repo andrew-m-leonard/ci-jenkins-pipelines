@@ -53,14 +53,15 @@ node("worker") {
         userRemoteConfigs = new JsonSlurper().parseText(USER_REMOTE_CONFIGS) as Map
     }
 
-    try {
-        load "${WORKSPACE}/${libraryPath}"
-    } catch (NoSuchFileException e) {
-        println "[WARNING] Using Adopt's import library script as none was found at ${WORKSPACE}/${libraryPath}"
-        checkoutAdoptPipelines()
-        load "${WORKSPACE}/${ADOPT_DEFAULTS_JSON['importLibraryScript']}"
-        checkout scm
-    }
+    //try {
+    //    load "${WORKSPACE}/${libraryPath}"
+    //} catch (NoSuchFileException e) {
+    //    println "[WARNING] Using Adopt's import library script as none was found at ${WORKSPACE}/${libraryPath}"
+    //    checkoutAdoptPipelines()
+    //    load "${WORKSPACE}/${ADOPT_DEFAULTS_JSON['importLibraryScript']}"
+    //    checkout scm
+    //}
+    library(identifier: 'openjdk-jenkins-helper@master')
 
     try {
         downstreamBuilder = load "${WORKSPACE}/${baseFilePath}"
