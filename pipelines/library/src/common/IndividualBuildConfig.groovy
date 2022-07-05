@@ -47,16 +47,12 @@ class IndividualBuildConfig implements Serializable {
         this(new JsonSlurper().parseText(json) as Map)
     }
 
-    IndividualBuildConfig(def context, String json) {
-context.println "IndividualBuildConfig contructor: ${json}"
-        this(new JsonSlurper().parseText(json) as Map)
-    }
-
     IndividualBuildConfig(Map<String, ?> map) {
         ARCHITECTURE = map.get("ARCHITECTURE") != null ? map.get("ARCHITECTURE").trim() : null
         TARGET_OS = map.get("TARGET_OS") != null ? map.get("TARGET_OS").trim() : null
         VARIANT = map.get("VARIANT") != null ? map.get("VARIANT").trim() : null
         JAVA_TO_BUILD = map.get("JAVA_TO_BUILD")!= null ? map.get("JAVA_TO_BUILD").trim() : null
+JAVA_TO_BUILD = "Bananas"
 
         if (String.class.isInstance(map.get("TEST_LIST"))) {
             TEST_LIST = map.get("TEST_LIST").split(",")

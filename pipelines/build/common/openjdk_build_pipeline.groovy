@@ -1824,7 +1824,7 @@ return {
         def buildConfig
         if (String.class.isInstance(buildConfigArg)) {
 context.println("IF 1")
-            buildConfig = new IndividualBuildConfig(context, buildConfigArg as String)
+            buildConfig = new IndividualBuildConfig(buildConfigArg as String)
         } else {
 context.println("IF 2")
             buildConfig = buildConfigArg as IndividualBuildConfig
