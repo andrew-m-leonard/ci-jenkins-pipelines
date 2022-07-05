@@ -1828,7 +1828,7 @@ return {
             buildConfig = buildConfigArg as IndividualBuildConfig
         }
 
-content.println "DEBUG openjdk return args : ${buildConfigArg}"
+context.println "DEBUG openjdk return args : ${buildConfigArg}"
 bldConf = buildConfig.toJson()
 context.println "DEBUG openjdk return : ${bldConf}"
         return new Build(
