@@ -1824,15 +1824,15 @@ return {
         def buildConfig
         if (String.class.isInstance(buildConfigArg)) {
 context.println("IF 1")
+context.println "DEBUG openjdk return args : ${buildConfigArg}"
             buildConfig = new IndividualBuildConfig(buildConfigArg as String)
+            bldConf = buildConfig.toJson()
+context.println "DEBUG openjdk return : ${bldConf}"
         } else {
 context.println("IF 2")
             buildConfig = buildConfigArg as IndividualBuildConfig
         }
 
-context.println "DEBUG openjdk return args : ${buildConfigArg}"
-bldConf = buildConfig.toJson()
-context.println "DEBUG openjdk return : ${bldConf}"
         return new Build(
             buildConfig,
             USER_REMOTE_CONFIGS,
