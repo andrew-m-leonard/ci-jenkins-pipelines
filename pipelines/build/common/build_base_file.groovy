@@ -770,6 +770,12 @@ class Builder implements Serializable {
             context.echo "Keep test reportdir: ${keepTestReportDir}"
             context.echo "Keep release logs: ${keepReleaseLogs}"
 
+            // Clean the controller "worker" node workspace of the previous pipeline build artifacts
+            context.node("worker") {
+                context.println "Cleaning controller node workspace of previous pipeline artifacts..."
+                context.sh "rm -rf target/*"
+            }
+
             jobConfigurations.each { configuration ->
                 jobs[configuration.key] = {
                     IndividualBuildConfig config = configuration.value
