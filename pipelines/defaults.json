@@ -1,6 +1,6 @@
 {
     "repository"             : {
-        "build_url"          : "https://github.com/andrew-m-leonard/temurin-build.git",
+        "build_url"          : "https://github.com/andrew-m-leonard/openjdk-build.git",
         "build_branch"       : "hotspotBldTime",
         "pipeline_url"       : "https://github.com/AdoptOpenJDK/ci-jenkins-pipelines.git",
         "pipeline_branch"    : "master"
