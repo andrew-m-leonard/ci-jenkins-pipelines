@@ -1305,6 +1305,7 @@ class Build {
             def repoHandler = new RepoHandler(USER_REMOTE_CONFIGS, ADOPT_DEFAULTS_JSON, buildConfig.CI_REF, buildConfig.BUILD_REF)
             repoHandler.setUserDefaultsJson(context, DEFAULTS_JSON['defaultsUrl'])
 
+context.println "MYJENKINS:"
             context.println 'USER_REMOTE_CONFIGS: '
             context.println JsonOutput.toJson(USER_REMOTE_CONFIGS)
             context.println 'DEFAULTS_JSON: '
@@ -1358,7 +1359,7 @@ class Build {
                     // Perform a git clean outside of checkout to avoid the Jenkins enforced 10 minute timeout
                     // https://github.com/adoptium/infrastucture/issues/1553
                     context.sh(script: 'git clean -fdx')
-
+context.println "MYJENKINS2:"
                     printGitRepoInfo()
                 }
             } catch (FlowInterruptedException e) {
