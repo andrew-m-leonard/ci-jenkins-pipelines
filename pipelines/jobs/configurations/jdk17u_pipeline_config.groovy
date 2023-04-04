@@ -39,7 +39,7 @@ class Config17 {
         ],
 
         x64AlpineLinux  : [
-                os                  : 'alpine-linux',
+                os                  : 'linux',
                 arch                : 'x64',
                 dockerImage         : 'adoptopenjdk/alpine3_build_image',
                 test                : 'default',
