@@ -1,7 +1,4 @@
 targetConfigurations = [
-        'x64Linux'    : [
-                'temurin'
-        ]
 ]
 
 // 03:30 Wed, Fri
@@ -13,5 +10,7 @@ triggerSchedule_weekly = 'TZ=UTC\n30 23 * * 6'
 weekly_release_scmReferences = [
         'temurin'        : ''
 ]
+
+disableJob = true
 
 return this
