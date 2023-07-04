@@ -916,9 +916,12 @@ class Builder implements Serializable {
 
                             if ((downstreamJob.getResult() != 'SUCCESS' || !copyArtifactSuccess) && propagateFailures) {
                                 context.error("Propagating downstream job result: ${downstreamJobName}, Result: "+downstreamJob.getResult()+" CopyArtifactsSuccess: "+copyArtifactSuccess)
+context.error("Current results = " + currentBuild.result)
                                 if (copyArtifactSuccess && downstreamJob.getResult() == 'UNSTABLE' && (currentBuild.result == 'SUCCESS' || currentBuild.result == 'UNSTABLE' )) {
+    context.error("SET UNSTABLE")
                                     currentBuild.result = 'UNSTABLE'
                                 } else {
+    context.error("SET FAILURE")
                                     currentBuild.result = 'FAILURE'
                                 }
                             }
