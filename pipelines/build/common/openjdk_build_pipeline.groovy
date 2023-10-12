@@ -1578,8 +1578,6 @@ class Build {
                                                     fi
                                                     chmod --reference="${dir}/unsigned_${file}" "$f"
                                                     rm -rf "${dir}/unsigned_${file}"
-                                                    echo "Checking if $f is signed..."
-                                                    codesign -dvvv "$f"
                                                 done
                                             '''
                                             // groovylint-enable
@@ -1598,6 +1596,28 @@ class Build {
 
                                     // Restore signed JMODs
                                     context.unstash 'signed_jmods'
+                                   
+                                    context.withEnv(['base_os='+target_os, 'base_path='+base_path]) { 
+                                        context.sh '''
+                                                #!/bin/bash
+                                                set -eu
+                                                echo "Checking JMOD files are signed under build path ${base_path} for base_os ${base_os}"
+                                                TMP_DIR="${base_path}/"
+                                                if [ "${base_os}" == "mac" ]; then
+                                                    ENTITLEMENTS="$WORKSPACE/entitlements.plist"
+                                                    FILES=$(find "${TMP_DIR}" -perm +111 -type f -o -name '*.dylib' -type f || find "${TMP_DIR}" -perm /111 -type f -o -name '*.dylib'  -type f)
+                                                else
+                                                    FILES=$(find "${TMP_DIR}" -type f -name '*.exe' -o -name '*.dll')
+                                                fi
+                                                for f in $FILES
+                                                do
+                                                    if [ "${base_os}" == "mac" ]; then
+                                                        echo "Checking if $f is signed..."
+                                                        codesign -dvvv "$f"
+                                                    fi
+                                                done 
+                                        '''
+                                    }
 
                                     def assembleBuildArgs
                                     if (env.BUILD_ARGS != null && !env.BUILD_ARGS.isEmpty()) {
