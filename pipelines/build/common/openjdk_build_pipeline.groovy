@@ -1624,8 +1624,8 @@ class Build {
                                echo "Check for APPLE!"
                                ls -l "$f"
                                cat "$f"
+                               codesign -dvvv "$f"
                              fi
-                                                        codesign -dvvv "$f"
                                                     fi
                                                 done 
                                         '''
