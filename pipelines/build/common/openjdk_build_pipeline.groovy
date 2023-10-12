@@ -1578,6 +1578,8 @@ class Build {
                                                     fi
                                                     chmod --reference="${dir}/unsigned_${file}" "$f"
                                                     rm -rf "${dir}/unsigned_${file}"
+                                                    echo "Checking if $f is signed..."
+                                                    codesign -dvvv "$f"
                                                 done
                                             '''
                                             // groovylint-enable
