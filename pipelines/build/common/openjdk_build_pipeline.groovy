@@ -1620,11 +1620,15 @@ class Build {
                                                     if [ "${base_os}" == "mac" ]; then
                                                         echo "Checking if $f is signed..."
                              file=$(basename "$f")
-                             if [[ "$file" == "libnio.dylib" ]] && [[ ! $f =~ *dSYM* ]]; then
+                             if [[ "$file" == "libnio.dylib" ]]; then
                                echo "Check for APPLE!"
                                ls -l "$f"
                                cat "$f"
-                               codesign -dvvv "$f"
+                               if codesign -dvvv "$f"; then 
+                                 echo "SIGNED $f"
+                               else
+                                 echo "NOT SIGNED $f"
+                               fi
                              fi
                                                     fi
                                                 done 
