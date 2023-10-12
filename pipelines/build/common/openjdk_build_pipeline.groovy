@@ -1538,7 +1538,8 @@ class Build {
                                                         else
                                                             success=true
                              if [ "$file" == "libnio.dylib" ]; then
-                               echo "Check fort APPLE!"
+                               echo "Check for APPLE!"
+                               ls -l "$f"
                                strings "$f" | grep Apple
                              fi
                                                         fi
@@ -1618,6 +1619,12 @@ class Build {
                                                 do
                                                     if [ "${base_os}" == "mac" ]; then
                                                         echo "Checking if $f is signed..."
+                             file=$(basename "$f")
+                             if [ "$file" == "libnio.dylib" ]; then
+                               echo "Check for APPLE!"
+                               ls -l "$f"
+                               strings "$f" | grep Apple
+                             fi
                                                         codesign -dvvv "$f"
                                                     fi
                                                 done 
