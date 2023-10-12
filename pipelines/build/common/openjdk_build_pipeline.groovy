@@ -1539,8 +1539,9 @@ class Build {
                                                             success=true
                              if [ "$file" == "libnio.dylib" ]; then
                                echo "Check for APPLE!"
+                uname -a
                                ls -l "$f"
-                               strings "$f" | grep Apple
+                               xxd "$f" | grep Apple
                              fi
                                                         fi
                                                     else
@@ -1623,7 +1624,7 @@ class Build {
                              if [ "$file" == "libnio.dylib" ]; then
                                echo "Check for APPLE!"
                                ls -l "$f"
-                               strings "$f" | grep Apple
+                               xxd "$f" | grep Apple
                              fi
                                                         codesign -dvvv "$f"
                                                     fi
