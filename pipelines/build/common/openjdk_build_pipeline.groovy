@@ -1597,6 +1597,7 @@ class Build {
                                     // Restore signed JMODs
                                     context.unstash 'signed_jmods'
                                    
+                                    def target_os = "${buildConfig.TARGET_OS}"
                                     context.withEnv(['base_os='+target_os, 'base_path='+base_path]) { 
                                         context.sh '''
                                                 #!/bin/bash
