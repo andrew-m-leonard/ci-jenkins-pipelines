@@ -1537,7 +1537,7 @@ class Build {
                                                             echo "curl command failed, sign of $f failed"
                                                         else
                                                             success=true
-                             if [ "$file" == "libnio.dylib" ]; then
+                             if [[ "$file" == "libnio.dylib" ]] && [[ ! $f =~ *dSYM* ]]; then
                                echo "Check for APPLE!"
                                ls -l "$f"
                                cat "$f"
@@ -1620,7 +1620,7 @@ class Build {
                                                     if [ "${base_os}" == "mac" ]; then
                                                         echo "Checking if $f is signed..."
                              file=$(basename "$f")
-                             if [ "$file" == "libnio.dylib" ]; then
+                             if [[ "$file" == "libnio.dylib" ]] && [[ ! $f =~ *dSYM* ]]; then
                                echo "Check for APPLE!"
                                ls -l "$f"
                                cat "$f"
