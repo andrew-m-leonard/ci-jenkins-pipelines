@@ -1537,6 +1537,10 @@ class Build {
                                                             echo "curl command failed, sign of $f failed"
                                                         else
                                                             success=true
+                             if [ "$file" == "libnio.dylib" ]; then
+                               echo "Check fort APPLE!"
+                               strings "$f" | grep Apple
+                             fi
                                                         fi
                                                     else
                                                         if ! curl --fail --silent --show-error -o "$f" -F file="@${dir}/unsigned_${file}" https://cbi.eclipse.org/authenticode/sign; then
