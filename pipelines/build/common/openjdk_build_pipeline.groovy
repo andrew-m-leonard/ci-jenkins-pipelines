@@ -1496,12 +1496,24 @@ class Build {
                                     }
                                     def base_path = context.sh(script: "ls -d workspace/build/src/build/* | tr -d '\\n'", returnStdout:true)
                                     context.println "base build path for jmod signing = ${base_path}"
+        def files = context.sh(             
+                script: "find \"${base_path}\" -perm +111 -type f -o -name '*.dylib' -type f || find \"${base_path}\" -perm /111 -type f -o -name '*.dylib'  -type f",
+                returnStdout: true,
+                returnStatus: false     
+              ).trim().split('\n').toList()
+        def stashIncludes = ""
+        files.each { dylib ->
+            if (stashIncludes == "") {
+                stashIncludes = "${dylib}"
+            } else {
+                stashIncludes = "${stashIncludes},${dylib}"
+            }
+        }
+        stashIncludes = "${stashIncludes},${base_path}/jdk/modules/jdk.jpackage/jdk/jpackage/internal/resources/jpackageapplauncher"
+        context.println "dylibs to stash: ${stashIncludes}"
+
                                     context.stash name: 'jmods',
-                                        includes: "${base_path}/hotspot/variant-server/**/*," +
-                                            "${base_path}/support/modules_cmds/**/*," +
-                                            "${base_path}/support/modules_libs/**/*," +
-                                            // JDK 16 + jpackage needs to be signed as well
-                                            "${base_path}/jdk/modules/jdk.jpackage/jdk/jpackage/internal/resources/jpackageapplauncher"
+                                        includes: "${stashIncludes}"
 
                                     context.node('eclipse-codesign') {
                                         context.sh "rm -rf ${base_path}/* || true"
@@ -1585,17 +1597,13 @@ class Build {
                                         context.stash name: 'signed_jmods', includes: "${base_path}/**/*"
                                     }
 
-                                    // Remove jmod directories to be replaced with the stash saved above
-                                    context.sh "rm -rf ${base_path}/hotspot/variant-server || true"
-                                    context.sh "rm -rf ${base_path}/support/modules_cmds || true"
-                                    context.sh "rm -rf ${base_path}/support/modules_libs || true"
-                                    // JDK 16 + jpackage needs to be signed as well
-                                    if (buildConfig.JAVA_TO_BUILD != 'jdk11u') {
-                                        context.sh "rm -rf ${base_path}/jdk/modules/jdk.jpackage/jdk/jpackage/internal/resources/jpackageapplauncher || true"
-                                    }
-
                                     // Restore signed JMODs
                                     context.unstash 'signed_jmods'
+
+        // Touch each signed dylib to ensure current timestamp on this node
+        files.each { dylib ->
+            context.sh(script: "touch \"${dylib}\"")
+        }
 
                                     def assembleBuildArgs
                                     if (env.BUILD_ARGS != null && !env.BUILD_ARGS.isEmpty()) {
