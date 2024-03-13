@@ -338,6 +338,17 @@ def jdkVersion = "22"
 def jdkBranch = "jdk-22-dryrun-ga"
     jdkBranch = resolveGaTag(jdkVersion, jdkBranch)
 echo "Resolved = " + jdkBranch
+
+jdkVersion = "11"
+jdkBranch = "jdk-11.0.22-ga"
+    jdkBranch = resolveGaTag(jdkVersion, jdkBranch)
+echo "Resolved = " + jdkBranch
+
+jdkVersion = "8"
+jdkBranch = "jdk8u392-dryrun-ga"
+    jdkBranch = resolveGaTag(jdkVersion, jdkBranch)
+echo "Resolved = " + jdkBranch
+
 exit 1
 
 
