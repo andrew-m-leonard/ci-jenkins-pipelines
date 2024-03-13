@@ -280,6 +280,32 @@ def verifyReleaseContent(String version, String release, String variant, Map sta
     }
 }
 
+def resolveGaTag(String jdkVersion, String jdkBranch) {
+    def resolvedTag = jdkBranch // Default to as-is
+
+    def openjdkRepo = "https://github.com/openjdk/jdk${params.jdkVersion}.git"
+
+    def gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
+    if (gaCommitSHA == "") {
+        openjdkRepo = "https://github.com/openjdk/jdk${params.jdkVersion}u.git"
+        gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
+    }
+
+    if (gaCommitSHA == "") {
+        println "[ERROR] Unable to resolve ${jdkBranch} upstream commit, will try to match tag as-is"
+    } else {
+        def upstreamTag = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${gaCommitSHA}\" | tr -s '\\t ' ' ' | cut -d' ' -f2 | sed \"s,refs/tags/,,\"")
+        if (upstreamTag != "") {
+            println "[INFO] Resolved ${jdkBranch} to upstream build tag ${upstreamTag}"
+            resolvedTag = upstreamTag
+        } else {
+            println "[ERROR] Unable to resolve ${jdkBranch} upstream commit, will try to match tag as-is"
+        }
+    }
+
+    return resolvedTag
+}
+
 node('worker') {
   try{
     def variant = "${params.VARIANT}"
@@ -299,27 +325,8 @@ node('worker') {
 
 def jdkVersion = "22"
 def jdkBranch = "jdk-22-dryrun-ga"
-
-          def openjdkRepo = "https://github.com/openjdk/jdk${params.jdkVersion}.git"
-
-          def gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep "${jdkBranch}" | tr -s '\\t ' ' ' | cut -d' ' -f1")
-          if (gaCommitSHA == "") {
-            openjdkRepo = "https://github.com/openjdk/jdk${params.jdkVersion}u.git"
-            gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep "${jdkBranch}" | tr -s '\\t ' ' ' | cut -d' ' -f1")
-          }
-
-          if (gaCommitSHA == "") {
-              println "[ERROR] Unable to resolve ${jdkBranch} upstream commit, will try to match tag as-is"
-          } else {
-              def upstreamTag = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep "${gaCommitSHA}" | tr -s '\\t ' ' ' | cut -d' ' -f2 | sed \"s,refs/tags/,,\"")
-              if (upstreamTag != "") {
-                  println "[INFO] Resolved ${jdkBranch} to upstream build tag ${upstreamTag}"
-                  jdkBranch = upstreamTag
-              } else {
-                  println "[ERROR] Unable to resolve ${jdkBranch} upstream commit, will try to match tag as-is"
-              }
-          }
-
+    jdkBranch = resolveGaTag(jdkVersion, jdkBranch)
+echo "Resolved = " + jdkBranch
 exit 1
 
 
