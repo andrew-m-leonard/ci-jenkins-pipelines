@@ -296,6 +296,33 @@ node('worker') {
     def healthStatus = [:]
     def testStats = []
 
+
+def jdkVersion = "22"
+def jdkBranch = "jdk-22-dryrun-ga"
+
+          def openjdkRepo = "https://github.com/openjdk/jdk${params.jdkVersion}.git"
+
+          def gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep "${jdkBranch}" | tr -s '\\t ' ' ' | cut -d' ' -f1")
+          if (gaCommitSHA == "") {
+            openjdkRepo = "https://github.com/openjdk/jdk${params.jdkVersion}u.git"
+            gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep "${jdkBranch}" | tr -s '\\t ' ' ' | cut -d' ' -f1")
+          }
+
+          if (gaCommitSHA == "") {
+              println "[ERROR] Unable to resolve ${jdkBranch} upstream commit, will try to match tag as-is"
+          } else {
+              def upstreamTag = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep "${gaCommitSHA}" | tr -s '\\t ' ' ' | cut -d' ' -f2 | sed \"s,refs/tags/,,\"")
+              if (upstreamTag != "") {
+                  println "[INFO] Resolved ${jdkBranch} to upstream build tag ${upstreamTag}"
+                  jdkBranch = upstreamTag
+              } else {
+                  println "[ERROR] Unable to resolve ${jdkBranch} upstream commit, will try to match tag as-is"
+              }
+          }
+
+exit 1
+
+
     stage('getPipelineStatus') {
         def apiVariant = variant
         if (apiVariant == 'temurin') {
