@@ -285,21 +285,21 @@ def resolveGaTag(String jdkVersion, String jdkBranch) {
 
     def openjdkRepo = "https://github.com/openjdk/jdk${jdkVersion}.git"
 
-    def gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
+    def gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1 | tr -d '\\n'")
     if (gaCommitSHA == "") {
         // Try "updates" repo..
         openjdkRepo = "https://github.com/openjdk/jdk${jdkVersion}u.git"
-        gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
+        gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1 | tr -d '\\n'")
     }
     if (gaCommitSHA == "") {
         // Maybe an Adoptium "dryrun" try Adoptium mirror repo..
         openjdkRepo = "https://github.com/adoptium/jdk${jdkVersion}.git"
-        gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
+        gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1 | tr -d '\\n'")
     }
     if (gaCommitSHA == "") {
         // Maybe an Adoptium "dryrun" try Adoptium mirror "updates" repo..
         openjdkRepo = "https://github.com/adoptium/jdk${jdkVersion}u.git"
-        gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
+        gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1 | tr -d '\\n'")
     }
 
     if (gaCommitSHA == "") {
