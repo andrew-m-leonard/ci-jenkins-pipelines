@@ -283,11 +283,12 @@ def verifyReleaseContent(String version, String release, String variant, Map sta
 def resolveGaTag(String jdkVersion, String jdkBranch) {
     def resolvedTag = jdkBranch // Default to as-is
 
-    def openjdkRepo = "https://github.com/openjdk/jdk${params.jdkVersion}.git"
+    def openjdkRepo = "https://github.com/openjdk/jdk${jdkVersion}.git"
 
     def gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
     if (gaCommitSHA == "") {
-        openjdkRepo = "https://github.com/openjdk/jdk${params.jdkVersion}u.git"
+        // Try "updates" repo..
+        openjdkRepo = "https://github.com/openjdk/jdk${jdkVersion}u.git"
         gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
     }
 
