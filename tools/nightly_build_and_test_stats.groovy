@@ -334,8 +334,15 @@ node('worker') {
     def testStats = []
 
 
+
+
 def jdkVersion = "22"
 def jdkBranch = "jdk-22-dryrun-ga"
+    jdkBranch = resolveGaTag(jdkVersion, jdkBranch)
+echo "Resolved = " + jdkBranch
+
+jdkVersion = "23"
+jdkBranch = "jdk-23-ga"
     jdkBranch = resolveGaTag(jdkVersion, jdkBranch)
 echo "Resolved = " + jdkBranch
 
