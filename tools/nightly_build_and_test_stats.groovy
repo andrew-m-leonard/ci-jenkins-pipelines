@@ -291,6 +291,16 @@ def resolveGaTag(String jdkVersion, String jdkBranch) {
         openjdkRepo = "https://github.com/openjdk/jdk${jdkVersion}u.git"
         gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
     }
+    if (gaCommitSHA == "") {
+        // Maybe an Adoptium "dryrun" try Adoptium mirror repo..
+        openjdkRepo = "https://github.com/adoptium/jdk${jdkVersion}.git"
+        gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
+    }
+    if (gaCommitSHA == "") {
+        // Maybe an Adoptium "dryrun" try Adoptium mirror "updates" repo..
+        openjdkRepo = "https://github.com/adoptium/jdk${jdkVersion}u.git"
+        gaCommitSHA = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${jdkBranch}\" | tr -s '\\t ' ' ' | cut -d' ' -f1")
+    }
 
     if (gaCommitSHA == "") {
         println "[ERROR] Unable to resolve ${jdkBranch} upstream commit, will try to match tag as-is"
