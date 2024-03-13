@@ -305,6 +305,7 @@ def resolveGaTag(String jdkVersion, String jdkBranch) {
     if (gaCommitSHA == "") {
         println "[ERROR] Unable to resolve ${jdkBranch} upstream commit, will try to match tag as-is"
     } else {
+echo "git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${gaCommitSHA}\" | tr -s '\\t ' ' ' | cut -d' ' -f2 | sed \"s,refs/tags/,,\""
         def upstreamTag = sh(returnStdout: true, script:"git ls-remote --tags ${openjdkRepo} | grep '\\^{}' | grep \"${gaCommitSHA}\" | tr -s '\\t ' ' ' | cut -d' ' -f2 | sed \"s,refs/tags/,,\"")
         if (upstreamTag != "") {
             println "[INFO] Resolved ${jdkBranch} to upstream build tag ${upstreamTag}"
