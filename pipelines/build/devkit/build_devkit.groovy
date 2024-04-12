@@ -29,7 +29,7 @@ def adoptium_devkit_release_tag
 def build_devkit() {
     stage('Build DevKit') {
         // Make DevKit
-        sh("cd pipelines/build/devkit && ./make_devkit.sh ${params.VERSION} ${params.ARCH} ${params.BASE_OS} ${params.BASE_OS_VERSION}")
+        sh("export CC=/usr/local/gcc11/bin/gcc-11.2 && export CXX=/usr/local/gcc11/bin/g++-11.2 && export PATH=/usr/local/gcc11/bin:$PATH && export LD_LIBRARY_PATH=/usr/local/gcc11/lib64 && cd pipelines/build/devkit && ./make_devkit.sh ${params.VERSION} ${params.ARCH} ${params.BASE_OS} ${params.BASE_OS_VERSION}")
 
         def devkit_target="${params.ARCH}-linux-gnu"
 
