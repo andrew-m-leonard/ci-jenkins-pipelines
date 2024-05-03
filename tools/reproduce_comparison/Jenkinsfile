@@ -17,7 +17,7 @@ pipeline {
         stage('Prepare') { //Copy artifacts, reset parameters,trigger build and copyArtifacts
             agent { label NODE_LABEL }
             options {
-                timeout(time: 3, unit: 'HOURS')
+                timeout(time: 6, unit: 'HOURS')
             }
             steps {
                 cleanWs()
@@ -86,7 +86,7 @@ pipeline {
                     def result = reproducibleJob.getResult()
                     if (result == 'SUCCESS') {
                         try {
-                            timeout(time: 2, unit: 'HOURS') {
+                            timeout(time: 6, unit: 'HOURS') {
                                 copyArtifacts(
                                     projectName:"${COMPARED_JOB_NAME}",
                                     selector:specific("${reproducibleJob.getNumber()}"),
@@ -113,7 +113,7 @@ pipeline {
             agent { label NODE_LABEL }
             options {
                 // Timeout counter starts BEFORE agent is allocated
-                timeout(time: 30, unit: 'MINUTES')
+                timeout(time: 6, unit: 'HOURS')
             }
             steps {
                 cleanWs() // Ensure Prepare stage contents cleaned
