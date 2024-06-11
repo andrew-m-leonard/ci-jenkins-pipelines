@@ -1587,8 +1587,10 @@ class Build {
                                 updateGithubCommitStatus('PENDING', 'Build Started')
                             }
                             if (useAdoptShellScripts) {
-                                context.println '[CHECKOUT] Checking out to adoptium/temurin-build...'
-                                repoHandler.checkoutAdoptBuild(context)
+                                context.println '[CHECKOUT] Checking out to USER!!!!!/temurin-build...'
+                                #repoHandler.checkoutAdoptBuild(context)
+                                repoHandler.setUserDefaultsJson(context, DEFAULTS_JSON)
+                                repoHandler.checkoutUserBuild(context)
                                 printGitRepoInfo()
                                 if ((buildConfig.TARGET_OS == 'mac' || buildConfig.TARGET_OS == 'windows') && buildConfig.JAVA_TO_BUILD != 'jdk8u') {
                                     context.println "Processing exploded build, sign JMODS, and assemble build, for platform ${buildConfig.TARGET_OS} version ${buildConfig.JAVA_TO_BUILD}"
@@ -1618,7 +1620,7 @@ class Build {
                                     context.node('eclipse-codesign') {
                                         context.sh "rm -rf ${base_path}/* || true"
 
-                                        repoHandler.checkoutAdoptBuild(context)
+                                        repoHandler.checkoutUserBuild(context)
                                         printGitRepoInfo()
 
                                         // Copy pre assembled binary ready for JMODs to be codesigned
