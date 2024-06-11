@@ -1588,7 +1588,7 @@ class Build {
                             }
                             if (useAdoptShellScripts) {
                                 context.println '[CHECKOUT] Checking out to USER!!!!!/temurin-build...'
-                                #repoHandler.checkoutAdoptBuild(context)
+                                //repoHandler.checkoutAdoptBuild(context)
                                 repoHandler.setUserDefaultsJson(context, DEFAULTS_JSON)
                                 repoHandler.checkoutUserBuild(context)
                                 printGitRepoInfo()
