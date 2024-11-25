@@ -274,6 +274,7 @@ node('worker') {
             }
         }
     }
+sh(script:"sleep 60")
 } // End: node('worker')
 
 if (triggerMainBuild || triggerEvaluationBuild) {
