@@ -34,6 +34,7 @@ def variant="${params.VARIANT}"
 def mirrorRepo="${params.MIRROR_REPO}"
 def version="${params.JDK_VERSION}".toInteger()
 def binariesRepo="${params.BINARIES_REPO}"
+def trssUrl="${params.TRSS_URL}"
 
 def triggerMainBuild = false
 def triggerEvaluationBuild = false
@@ -47,6 +48,57 @@ def evaluationTargetConfigurations = overrideEvaluationTargetConfigurations
 
 def latestAdoptTag
 def publishJobTag
+
+// Check with TRSS if the given pipeline is in-progress?
+def isInProgress(String trssUrl, String variant, Integer version, String pipelineName, String publishName, String scmRef, String targetConfig) {
+    def inProgress = false
+
+    echo "Checking if an existing build is in-progress for: variant=${variant}, pipeline=${pipelineName}, publishName=${publishName}, scmRef=${scmRef}"
+    echo "    targetConfig=${targetConfig}"
+
+    def pipeline = sh(returnStdout: true, script: "wget -q -O - ${trssUrl}/api/getBuildHistory?buildName=${pipelineName}")
+    def pipelineJson = new JsonSlurper().parseText(pipeline)
+
+    if (pipelineJson.size() > 0) {
+        pipelineJson.each { job ->
+            def overridePublishName = ""
+            def buildScmRef = ""
+            def containsX64AlpineLinux = false
+            def containsVariant = false
+
+            job.buildParams.each { buildParam ->
+                if (buildParam.name == "overridePublishName") {
+                    overridePublishName = buildParam.value
+                } else if (buildParam.name == "scmReference") {
+                    buildScmRef = buildParam.value
+                } else if (buildParam.name == "targetConfigurations") {
+                    containsX64AlpineLinux = (buildParam.value.contains("x64AlpineLinux"))
+                    containsVariant        = (buildParam.value.contains(variant))
+                }
+            }
+
+            // Is there a job for the required tag?
+            if (containsVariant && overridePublishName == publishName && buildScmRef == scmRef && job.status != null) {
+                if (version == 8) {
+                    // alpine-jdk8u cannot be distinguished from jdk8u by the scmRef alone, so check for "x64AlpineLinux" in the targetConfiguration
+                    if ((targetConfig.contains("x64AlpineLinux") && containsX64AlpineLinux) || (!targetConfig.contains("x64AlpineLinux") && !containsX64AlpineLinux)) {
+                        if (job.status == "Streaming") {
+                            inProgress = true
+                        }
+                    }
+                } else {
+                    if (job.status == "Streaming") {
+                        inProgress = true
+                    }
+                }
+            }
+        }
+    }
+
+    echo "==> inProgress = ${inProgress}"
+
+    return inProgress
+}
 
 // Is the current day within the release period of from the previous Saturday to the following Sunday
 // from the release Tuesday ?
@@ -233,14 +285,20 @@ if (triggerMainBuild || triggerEvaluationBuild) {
     def pipelines = [:]
 
     if (triggerMainBuild) {
-        pipelines["main"] = "build-scripts/openjdk${version}-pipeline"
-        echo "main build targetConfigurations:"
-        echo JsonOutput.prettyPrint(mainTargetConfigurations)
+        def main_in_progress = isInProgress(trssUrl, variant, version, "openjdk${version}-pipeline", "$publishJobTag", "$latestAdoptTag", "${mainTargetConfigurations}")
+        if (!main_in_progress) {
+            pipelines["main"] = "build-scripts/openjdk${version}-pipeline"
+            echo "main build targetConfigurations:"
+            echo JsonOutput.prettyPrint(mainTargetConfigurations)
+        }
     }
     if (triggerEvaluationBuild) {
-        pipelines["evaluation"] = "build-scripts/evaluation-openjdk${version}-pipeline"
-        echo "evaluation build targetConfigurations:"
-        echo JsonOutput.prettyPrint(evaluationTargetConfigurations)
+        def evaluation_in_progress = isInProgress(trssUrl, variant, version, "evaluation-openjdk${version}-pipeline", "$publishJobTag", "$latestAdoptTag", "${evaluationTargetConfigurations}")
+        if (!evaluation_in_progress) {
+            pipelines["evaluation"] = "build-scripts/evaluation-openjdk${version}-pipeline"
+            echo "evaluation build targetConfigurations:"
+            echo JsonOutput.prettyPrint(evaluationTargetConfigurations)
+        }
     }
 
     pipelines.keySet().each { pipeline_type ->
@@ -267,9 +325,10 @@ if (triggerMainBuild || triggerEvaluationBuild) {
                         jobParams.add(text(name: 'targetConfigurations',   value: JsonOutput.prettyPrint(evaluationTargetConfigurations)))
                     }
 
-                    def job = build job: "${pipeline}", propagate: true, parameters: jobParams
+                    //xxxxxxdef job = build job: "${pipeline}", propagate: true, parameters: jobParams
 
-                    echo "Triggered ${pipeline} build result = "+ job.getResult()
+                    //xxxxxxecho "Triggered ${pipeline} build result = "+ job.getResult()
+echo "TRIGGER!!"
                 }
             }
         }
