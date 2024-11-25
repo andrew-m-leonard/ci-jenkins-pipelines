@@ -286,7 +286,7 @@ if (triggerMainBuild || triggerEvaluationBuild) {
 
     if (triggerMainBuild) {
         def main_in_progress = isInProgress(trssUrl, variant, version, "openjdk${version}-pipeline", "$publishJobTag", "$latestAdoptTag", "${mainTargetConfigurations}")
-        if (!main_in_progress) {
+        if (!main_in_progress || params.FORCE_MAIN) {
             pipelines["main"] = "build-scripts/openjdk${version}-pipeline"
             echo "main build targetConfigurations:"
             echo JsonOutput.prettyPrint(mainTargetConfigurations)
@@ -294,7 +294,7 @@ if (triggerMainBuild || triggerEvaluationBuild) {
     }
     if (triggerEvaluationBuild) {
         def evaluation_in_progress = isInProgress(trssUrl, variant, version, "evaluation-openjdk${version}-pipeline", "$publishJobTag", "$latestAdoptTag", "${evaluationTargetConfigurations}")
-        if (!evaluation_in_progress) {
+        if (!evaluation_in_progress || params.FORCE_EVALUATION) {
             pipelines["evaluation"] = "build-scripts/evaluation-openjdk${version}-pipeline"
             echo "evaluation build targetConfigurations:"
             echo JsonOutput.prettyPrint(evaluationTargetConfigurations)
