@@ -135,7 +135,7 @@ void verifyExecutables(String unpack_dir, String issueToOrg) {
                     if file ${f} | grep "Mach-O 64-bit executable\\|Mach-O 64-bit dynamically linked shared library" >/dev/null; then
                         dir=$(dirname "$f")
                         if [[ "${dir}" =~ .*jdk.jpackage/jdk/jpackage/internal/resources$ ]]; then
-                            echo "Skipping jpackage applauncher resource file $file"
+                            echo "Skipping jpackage applauncher resource file $f"
                         elif ! codesign --verify ${f}; then
                             echo "Error: executable not Signed: ${f}"
                             unsigned="$unsigned $f"
@@ -186,7 +186,7 @@ void verifyExecutables(String unpack_dir, String issueToOrg) {
                   do
                     dir=$(dirname "$f")
                     if [[ "${dir}" =~ .*jdk.jpackage/jdk/jpackage/internal/resources$ ]]; then
-                        echo "Skipping jpackage applauncher resource file $file"
+                        echo "Skipping jpackage applauncher resource file $f"
                     elif ! "${signtool}" verify /pa ${f}; then
                         echo "Error: executable not Signed: ${f}"
                         unsigned="$unsigned $f"
