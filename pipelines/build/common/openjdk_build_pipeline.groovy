@@ -1614,6 +1614,10 @@ class Build {
                                                     if [[ "${dir}" =~ .*jdk.jpackage/jdk/jpackage/internal/resources$ ]]; then
                                                         echo "Skipping jpackage applauncher resource file $file"
                                                         jpackage_file_skipped=true
+                                                        if [ "${base_os}" == "mac" ]; then
+                                                            echo "Removing executable flag from MacOS jpackage applauncher resource file $file"
+                                                            chmod -x "$f"
+                                                        fi
                                                     fi
                                                     if [ $ms_file_skipped == false ] && [ $jpackage_file_skipped == false ]; then
                                                         echo "Signing $f using Eclipse Foundation codesign service"
