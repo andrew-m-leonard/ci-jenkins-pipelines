@@ -1603,6 +1603,7 @@ class Build {
                                                     dir=$(dirname "$f")
                                                     file=$(basename "$f")
                                                     ms_file_skipped=false
+                                                    jpackage_file_skipped=false
                                                     if [ "${base_os}" == "windows" ]; then
                                                         # Check if file is a Microsoft supplied file that is already signed
                                                         if [[ "$file" =~ api-ms-win.* ]] || [[ "$file" =~ API-MS-Win.* ]] || [[ "$file" =~ msvcp.* ]] || [[ "$file" =~ ucrtbase.* ]] || [[ "$file" =~ vcruntime.* ]]; then
@@ -1610,7 +1611,11 @@ class Build {
                                                             ms_file_skipped=true
                                                         fi
                                                     fi
-                                                    if [ $ms_file_skipped == false ]; then
+                                                    if [[ "${dir}" =~ .*jdk.jpackage/jdk/jpackage/internal/resources$ ]]; then
+                                                        echo "Skipping jpackage applauncher resource file $file"
+                                                        jpackage_file_skipped=true
+                                                    fi
+                                                    if [ $ms_file_skipped == false ] && [ $jpackage_file_skipped == false ]; then
                                                         echo "Signing $f using Eclipse Foundation codesign service"
                                                         mv "$f" "${dir}/unsigned_${file}"
                                                         success=false

@@ -133,7 +133,10 @@ void verifyExecutables(String unpack_dir, String issueToOrg) {
                   do
                     # Is file a Mac 64 bit executable or dylib ?
                     if file ${f} | grep "Mach-O 64-bit executable\\|Mach-O 64-bit dynamically linked shared library" >/dev/null; then
-                        if ! codesign --verify ${f}; then
+                        dir=$(dirname "$f")
+                        if [[ "${dir}" =~ .*jdk.jpackage/jdk/jpackage/internal/resources$ ]]; then
+                            echo "Skipping jpackage applauncher resource file $file"
+                        elif ! codesign --verify ${f}; then
                             echo "Error: executable not Signed: ${f}"
                             unsigned="$unsigned $f"
                             cc_unsigned=$((cc_unsigned+1))
@@ -181,7 +184,10 @@ void verifyExecutables(String unpack_dir, String issueToOrg) {
                 FILES=$(find ${unpack_dir} -type f -name '*.exe' -o -name '*.dll')
                 for f in $FILES
                   do
-                    if ! "${signtool}" verify /pa ${f}; then
+                    dir=$(dirname "$f")
+                    if [[ "${dir}" =~ .*jdk.jpackage/jdk/jpackage/internal/resources$ ]]; then
+                        echo "Skipping jpackage applauncher resource file $file"
+                    elif ! "${signtool}" verify /pa ${f}; then
                         echo "Error: executable not Signed: ${f}"
                         unsigned="$unsigned $f"
                         cc_unsigned=$((cc_unsigned+1))
