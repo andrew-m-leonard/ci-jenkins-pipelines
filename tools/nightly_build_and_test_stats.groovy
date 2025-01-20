@@ -648,11 +648,15 @@ node('worker') {
 
               def status = []
               if (assetsJson.size() > 0) {
-                def releaseName = assetsJson[0].release_name
+                def a_i = 0
+                def releaseName = assetsJson[a_i].release_name
+if (releaseName.contains("solaris") && assetsJson.size() > 1) {
+  a_i = 1
+}
                 if (nonTagBuildReleases.contains(featureRelease)) {
                   // A non tag build, eg.a scheduled build for Oracle managed STS versions
                   def latestOpenjdkBuild = getLatestOpenjdkBuildTag(featureRelease)
-                  def ts = assetsJson[0].timestamp // newest timestamp of a jdk asset
+                  def ts = assetsJson[a_i].timestamp // newest timestamp of a jdk asset
                   def assetTs = Instant.parse(ts).atZone(ZoneId.of('UTC'))
                   def now = ZonedDateTime.now(ZoneId.of('UTC'))
                   def days = ChronoUnit.DAYS.between(assetTs, now)
