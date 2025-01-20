@@ -652,6 +652,7 @@ node('worker') {
                 def releaseName = assetsJson[a_i].release_name
 if (releaseName.contains("solaris") && assetsJson.size() > 1) {
   a_i = 1
+  releaseName = assetsJson[a_i].release_name
 }
                 if (nonTagBuildReleases.contains(featureRelease)) {
                   // A non tag build, eg.a scheduled build for Oracle managed STS versions
