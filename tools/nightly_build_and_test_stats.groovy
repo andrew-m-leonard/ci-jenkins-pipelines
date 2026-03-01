@@ -54,7 +54,7 @@ def getPlatformReproTestMap() {
                                 x64Mac:             ["special.system", "Rebuild_Same_JDK_Reproducibility_Test_Mac"],
                                 ppc64leLinux:       ["special.system", "Rebuild_Same_JDK_Reproducibility_Test"],
                                 aarch64Linux:       ["special.system", "Rebuild_Same_JDK_Reproducibility_Test"],
-                                s390xLinux:         ["special.system", "Rebuild_Same_JDK_Reproducibility_Test_s390x"],
+                                s390xLinux:         ["special.system", "Rebuild_Same_JDK_Reproducibility_Test"],
                                 aarch64Mac:         ["special.system", "Rebuild_Same_JDK_Reproducibility_Test_Mac"]
                                ]
     return platformReproTestMap
