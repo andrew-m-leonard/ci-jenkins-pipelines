@@ -660,6 +660,22 @@ def getReproducibilityPercentage(String jdkVersion, String trssId, String trssUR
     }
 }
 
+// Get remote JCK target pass/fail counts for a single AQA_Test_Pipeline_JCK build.
+// Returns [failed, total] for completed targets only; null buildResult means still running.
+def getRemoteJckResults(String trssUrl, String jckBuildUrl, Integer buildNum, String cookieJar) {
+    def jckJson = callWgetSafely("${trssUrl}/api/getRemoteJckBuildInfo?url=${jckBuildUrl}\\&buildName=AQA_Test_Pipeline_JCK\\&buildNum=${buildNum}", cookieJar)
+    if (jckJson.length() <= 2) {
+        return [0, 0]
+    }
+    def parsed = new JsonSlurper().parseText(jckJson)
+    if (!(parsed instanceof List) || parsed.size() == 0) {
+        return [0, 0]
+    }
+    def total  = parsed.count { it.buildResult != null }
+    def failed = parsed.count { it.buildResult != null && it.buildResult != 'SUCCESS' }
+    return [failed, total]
+}
+
 // Get the Pipeline Test job results...
 def getPipelineTestResults(String trssUrl, String pipelineName, String pipelineUrl, String pipeline_id, String buildVariant, String testVariant, String cookieJar) {
     def buildJobComplete = 0
@@ -740,6 +756,8 @@ def getFailedTestSummary(String trssUrl, String variant, String featureRelease, 
     def testJobTotal        = 0
     def failedTestTargetNum = 0
     def testTargetTotal     = 0
+    def remoteTargetFailed  = 0
+    def remoteTargetTotal   = 0
 
     // Find all "Done" or "Streaming" pipeline jobs for this release EA tag
     def buildUrls
@@ -758,13 +776,40 @@ def getFailedTestSummary(String trssUrl, String variant, String featureRelease, 
             testJobTotal        += testResults.testJobNumber
             failedTestTargetNum += testResults.testTargetFailed
             testTargetTotal     += (testResults.testTargetPassed + testResults.testTargetFailed)
+
+            // Only temurin/hotspot pipelines run JCK; openj9 is intentionally excluded.
+            if (variant == 'temurin' || variant == 'hotspot') {
+                def jckBuilds = callWgetSafely("${trssUrl}/api/getAllChildBuilds?parentId=${probableBuildIdForTRSS}\\&buildNameRegex=^AQA_Test_Pipeline_JCK\$", cookieJar)
+                if (jckBuilds.length() > 2) {
+                    def jckBuildsJson = new JsonSlurper().parseText(jckBuilds)
+                    echo "Found ${jckBuildsJson.size()} AQA_Test_Pipeline_JCK build(s) under pipeline ${probableBuildIdForTRSS}"
+                    def pipelineJckFailed = 0
+                    def pipelineJckTotal  = 0
+                    jckBuildsJson.each { jckBuild ->
+                        if (jckBuild.buildResult != null) {
+                            def (jckFailed, jckTotal) = getRemoteJckResults(trssUrl, jckBuild.url, jckBuild.buildNum as Integer, cookieJar)
+                            pipelineJckFailed += jckFailed
+                            pipelineJckTotal  += jckTotal
+                            echo "  JCK build ${jckBuild.buildNum} (${jckBuild.buildResult}): remoteTargets failed=${jckFailed} total=${jckTotal}"
+                        }
+                    }
+                    remoteTargetFailed += pipelineJckFailed
+                    remoteTargetTotal  += pipelineJckTotal
+                    echo "JCK RemoteTargets for pipeline ${probableBuildIdForTRSS}: failed=${pipelineJckFailed} total=${pipelineJckTotal}"
+                }
+            }
         }
     }
 
-    if (testJobTotal == 0) {
+    if (testJobTotal == 0 && remoteTargetTotal == 0) {
         return " _"+noAqaTestsRunString()+"._"
-    } else if ((failedTestJobNum + failedTestTargetNum) == 0) {
-        return "\n_AQA tests successful: "+testJobTotal+" jobs & "+testTargetTotal+" targets run._"
+    } else if ((failedTestJobNum + failedTestTargetNum + remoteTargetFailed) == 0) {
+        def successMsg = "\n_AQA tests successful: "+testJobTotal+" jobs & "+testTargetTotal+" targets run."
+        if (remoteTargetTotal > 0) {
+            successMsg += " RemoteTargets=0/"+remoteTargetTotal
+        }
+        successMsg += "_"
+        return successMsg
     } else {
         def summary = "\n_AQA test failures:"
         if (failedTestJobNum > 0) {
@@ -772,6 +817,9 @@ def getFailedTestSummary(String trssUrl, String variant, String featureRelease, 
         }
         if (failedTestTargetNum > 0) {
             summary += " TestTargets="+failedTestTargetNum+"/"+testTargetTotal
+        }
+        if (remoteTargetTotal > 0) {
+            summary += " RemoteTargets="+remoteTargetFailed+"/"+remoteTargetTotal
         }
         summary += "._"
         return summary
@@ -819,7 +867,7 @@ node('worker') {
         def variant = "${params.VARIANT}"
         def trssUrl    = "${params.TRSS_URL}"
         def apiUrl    = "${params.API_URL}"
-        def slackChannel = "${params.SLACK_CHANNEL}"
+        def slackChannel = "${params.SLACK_CHANNEL}" // groovylint-disable-line UnusedVariable
         def featureReleases = "${params.FEATURE_RELEASES}".split("[, ]+") // feature versions
         def tipReleases     = "${params.TIP_RELEASES}".split("[, ]+") // Current jdk(head) versions
         def nightlyStaleDays = "${params.MAX_NIGHTLY_STALE_DAYS}"
@@ -1078,13 +1126,13 @@ node('worker') {
             echo "======> Test Success Rating   = ${nightlyTestSuccessRating.intValue()} %"
             echo "======> Overall Latest Build & Test Success Rating = ${overallNightlySuccessRating} %"
 
-            def statusColor = 'good'
+            def statusColor = 'good' // groovylint-disable-line UnusedVariable
             if (nightlyBuildSuccessRating.intValue() < amberBuildAlertLevel || nightlyTestSuccessRating.intValue() < amberTestAlertLevel) {
                 statusColor = 'warning'
             }
 
             // Slack message:
-            slackSend(channel: slackChannel, color: statusColor, message: 'Adoptium last 7 days Overall EA Build Success Rating : *' + variant + '* => *' + overallNightlySuccessRating + '* %\n  Build Job Rating: ' + totalBuildJobs + ' jobs (' + nightlyBuildSuccessRating.intValue() + '%)  Test Job Rating: ' + totalTestJobs + ' jobs (' + nightlyTestSuccessRating.intValue() + '%) <' + BUILD_URL + '/console|Detail>')
+            //slackSend(channel: slackChannel, color: statusColor, message: 'Adoptium last 7 days Overall EA Build Success Rating : *' + variant + '* => *' + overallNightlySuccessRating + '* %\n  Build Job Rating: ' + totalBuildJobs + ' jobs (' + nightlyBuildSuccessRating.intValue() + '%)  Test Job Rating: ' + totalTestJobs + ' jobs (' + nightlyTestSuccessRating.intValue() + '%) <' + BUILD_URL + '/console|Detail>')
 
             echo 'Adoptium last 7 days Overall Build Success Rating : *' + variant + '* => *' + overallNightlySuccessRating + '* %\n  Build Job Rating: ' + totalBuildJobs + ' jobs (' + nightlyBuildSuccessRating.intValue() + '%)  Test Job Rating: ' + totalTestJobs + ' jobs (' + nightlyTestSuccessRating.intValue() + '%) <' + BUILD_URL + '/console|Detail>'
         }
@@ -1158,8 +1206,8 @@ node('worker') {
                         }
                     }
 
-                    // If AQA tests run, then find reproducible build results...
-                    if (!failedTestSummary.contains(noAqaTestsRunString()) && reproducibleBuilds.containsKey(featureRelease)) {
+                    // Only run reproducibility check when AQA test jobs actually ran (not JCK-only).
+                    if (!failedTestSummary.contains(noAqaTestsRunString()) && !failedTestSummary.contains("0 jobs") && reproducibleBuilds.containsKey(featureRelease)) {
                         def reproDetailSummary = ""
 
                         def (reproBuildUrl, reproBuildTrss, reproBuildStatus) = ["", "", ""]
@@ -1257,7 +1305,7 @@ node('worker') {
                     def releaseLink = "<" + status['assetsUrl'] + "|${releaseName}>"
                     def fullMessage = "${featureRelease} EA: *${health}*. Build: ${releaseLink}.${failedTestSummary}${lastPublishedMsg}${errorMsg}${missingMsg}${reproSummary}"
                     echo "===> ${fullMessage}"
-                    slackSend(channel: slackChannel, color: slackColor, message: fullMessage)
+                    //slackSend(channel: slackChannel, color: slackColor, message: fullMessage)
                 }
                 echo '----------------------------------------------------------------'
             }
