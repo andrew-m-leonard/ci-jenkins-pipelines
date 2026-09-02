@@ -72,7 +72,7 @@ class Build {
     String crossCompileVersionPath = ''
     Map variantVersion = [:]
 
-    // Primary platforms for TCK testing: arch_os combinations that are considered primary
+    // Primary platforms for Temurin TCK testing: arch_os combinations that are considered primary
     static final Set<String> PRIMARY_PLATFORMS = [
         'x64_linux',
         'x64_windows',
