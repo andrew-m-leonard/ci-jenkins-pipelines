@@ -17,7 +17,6 @@ import java.nio.file.NoSuchFileException
 import groovy.json.JsonOutput
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.time.Month
 import java.time.DayOfWeek
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
@@ -47,29 +46,22 @@ def evaluationTargetConfigurations = overrideEvaluationTargetConfigurations
 def latestAdoptTag
 def publishJobTag
 
-// Is the current day within the release period of from the previous Saturday to the following Sunday
-// from the release Tuesday ?
-// Release Tuesday is now the 3rd Tuesday of the month
+// Is the current day within the release period from release Tuesday to 7 days after?
+// Release Tuesday is the 3rd Tuesday of the month.
+// Checked every month to account for CSPUs which can release in any month.
 def isDuringReleasePeriod() {
     def releasePeriod = false
     def now = ZonedDateTime.now(ZoneId.of('UTC'))
-    def month = now.getMonth()
 
-    // Is it a release month? CPU updates in Jan, Apr, Jul, Oct
-    // New major versions are released in Mar and Sept
-    if (month == Month.JANUARY || month == Month.MARCH || month == Month.APRIL || month == Month.JULY || month == Month.SEPTEMBER || month == Month.OCTOBER) {
-        // Yes, calculate release Tuesday, which is the 3rd Tuesday of the month
-        def day1st = now.withDayOfMonth(1)
-        def releaseTuesday = day1st.with(TemporalAdjusters.dayOfWeekInMonth(3, DayOfWeek.TUESDAY))
-        echo "Release Tuesday for this month is: "+releaseTuesday
+    // Calculate the 3rd Tuesday of the current month
+    def day1st = now.withDayOfMonth(1)
+    def releaseTuesday = day1st.with(TemporalAdjusters.dayOfWeekInMonth(3, DayOfWeek.TUESDAY))
+    echo "Release Tuesday for this month is: "+releaseTuesday
 
-        // Release period no "testing" trigger, from release tuesday to 7 days after
-        def days = ChronoUnit.DAYS.between(releaseTuesday, now)
-        if (days >= 0 && days <= 7) {
-            releasePeriod = true
-        }
-    } else {
-        echo "No releases this month"
+    // Release period no "testing" trigger, from release tuesday to 7 days after
+    def days = ChronoUnit.DAYS.between(releaseTuesday, now)
+    if (days >= 0 && days <= 7) {
+        releasePeriod = true
     }
 
     echo "Is within release period? "+releasePeriod
