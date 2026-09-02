@@ -84,7 +84,7 @@ class Build {
     /*
     Returns true if the given architecture and OS combination is a primary platform for TCK testing
     */
-    boolean isPrimaryPlatform(String javaToBuild, String architecture, String targetOs) {
+    boolean isPrimaryPlatform(String architecture, String targetOs) {
         return PRIMARY_PLATFORMS.contains("${architecture}_${targetOs}".toLowerCase())
     }
 
@@ -2011,7 +2011,7 @@ def buildScriptsAssemble(
                 def enableInstallers = Boolean.valueOf(buildConfig.ENABLE_INSTALLERS)
                 def enableSigner = Boolean.valueOf(buildConfig.ENABLE_SIGNER)
                 def enableTCK = Boolean.valueOf(buildConfig.RELEASE) ||
-                    (Boolean.valueOf(buildConfig.WEEKLY) && isPrimaryPlatform(buildConfig.JAVA_TO_BUILD, buildConfig.ARCHITECTURE, buildConfig.TARGET_OS))
+                    (Boolean.valueOf(buildConfig.WEEKLY) && isPrimaryPlatform(buildConfig.ARCHITECTURE, buildConfig.TARGET_OS))
                 if ('jdk'.equalsIgnoreCase(buildConfig.JAVA_TO_BUILD.trim())) { enableTCK = false }
                 def useAdoptShellScripts = Boolean.valueOf(buildConfig.USE_ADOPT_SHELL_SCRIPTS)
                 def cleanWorkspace = Boolean.valueOf(buildConfig.CLEAN_WORKSPACE)
